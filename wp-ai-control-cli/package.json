@@ -1,0 +1,21 @@
+{
+  "name": "wp-ai-control-cli",
+  "version": "1.0.0",
+  "description": "CLI tool for WP AI Control - Manage WordPress sites via command line",
+  "bin": {
+    "wpai": "./bin/wpai.js",
+    "wp-ai-control": "./bin/wpai.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "node-fetch": "^3.3.0",
+    "dotenv": "^16.4.0",
+    "ora": "^8.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["wordpress", "cli", "ai", "mcp", "automation"],
+  "license": "MIT"
+}

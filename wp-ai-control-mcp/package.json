@@ -1,0 +1,22 @@
+{
+  "name": "wp-ai-control-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MCP server for WP AI Control WordPress plugin",
+  "main": "index.js",
+  "bin": {
+    "wp-ai-control-mcp": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "dotenv": "^16.4.0",
+    "node-fetch": "^3.3.0"
+  }
+}
