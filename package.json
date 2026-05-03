@@ -1,0 +1,9 @@
+{
+  "name": "wp-ai-control-railway",
+  "version": "1.0.0",
+  "description": "WP AI Control MCP Server on Railway",
+  "scripts": {
+    "start": "cd wp-ai-control-mcp && npm install && node index.js"
+  },
+  "dependencies": {}
+}
