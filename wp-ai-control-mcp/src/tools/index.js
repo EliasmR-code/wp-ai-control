@@ -22,7 +22,7 @@ import bulk from './bulk.js';
 import woocommerce from './woocommerce.js';
 import acf from './acf.js';
 
-export const tools = [
+const allTools = [
   ...context,
   ...pages,
   ...posts,
@@ -47,3 +47,19 @@ export const tools = [
   ...woocommerce,
   ...acf,
 ];
+
+const sharedProps = {
+  site_url: { type: 'string', description: 'WordPress site URL (e.g., https://example.com)' },
+  api_key: { type: 'string', description: 'API key from WP AI Control plugin settings' }
+};
+
+export const tools = allTools.map(tool => {
+  const newTool = { ...tool };
+  const props = newTool.inputSchema.properties;
+  newTool.inputSchema = {
+    type: 'object',
+    properties: { ...sharedProps, ...props },
+    required: ['site_url', 'api_key', ...(newTool.inputSchema.required || [])]
+  };
+  return newTool;
+});

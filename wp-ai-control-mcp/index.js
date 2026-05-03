@@ -10,7 +10,7 @@ import { wpFetch } from './src/wp-client.js';
 import { tools } from './src/tools/index.js';
 
 const server = new Server(
-  { name: 'wp-ai-control-mcp', version: '1.0.0' },
+  { name: 'wp-ai-control-mcp', version: '1.1.0' },
   { capabilities: { tools: {} } }
 );
 
@@ -38,6 +38,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   let queryArgs = {};
   let bodyArgs = {};
 
+  const site_url = pathArgs.site_url;
+  const api_key = pathArgs.api_key;
+  delete pathArgs.site_url;
+  delete pathArgs.api_key;
+
   for (const param of pathParams) {
     if (pathArgs[param] !== undefined) {
       path = path.replace(`{${param}}`, String(pathArgs[param]));
@@ -55,7 +60,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   queryArgs = pathArgs;
 
   try {
-    const result = await wpFetch(path, { method, body: bodyArgs, params: queryArgs });
+    const result = await wpFetch(path, { method, body: bodyArgs, params: queryArgs, site_url, api_key });
     return {
       content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
     };

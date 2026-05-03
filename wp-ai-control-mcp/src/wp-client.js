@@ -1,14 +1,14 @@
 import fetch from 'node-fetch';
 
-const WP_URL = process.env.WP_URL;
-const WP_API_KEY = process.env.WP_API_KEY;
-
-if (!WP_URL || !WP_API_KEY) {
-  throw new Error('WP_URL and WP_API_KEY must be set in .env');
-}
-
-export async function wpFetch(path, { method = 'GET', body = null, params = {} } = {}) {
-  let url = `${WP_URL}/wp-json/wp-ai-control/v1${path}`;
+export async function wpFetch(path, { method = 'GET', body = null, params = {}, site_url = null, api_key = null } = {}) {
+  let url = site_url || process.env.WP_URL;
+  let apiKey = api_key || process.env.WP_API_KEY;
+  
+  if (!url || !apiKey) {
+    throw new Error('site_url and api_key are required. Pass them as arguments or set WP_URL and WP_API_KEY environment variables.');
+  }
+  
+  url = `${url.replace(/\/$/, '')}/wp-json/wp-ai-control/v1${path}`;
 
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -22,7 +22,7 @@ export async function wpFetch(path, { method = 'GET', body = null, params = {} }
   }
 
   const headers = {
-    'X-WPAIC-API-Key': WP_API_KEY,
+    'Authorization': `Bearer ${apiKey}`,
     'Content-Type': 'application/json',
   };
 
@@ -46,7 +46,7 @@ export async function wpFetch(path, { method = 'GET', body = null, params = {} }
       errorData = { message: errorText };
     }
     throw new Error(
-      `WP API Error (${response.status}): ${errorData.message || errorData.code || 'Unknown error'}\n${errorText}`
+      `WP API Error (${response.status}): ${errorData.message || errorData.code || 'Unknown error'}`
     );
   }
 
