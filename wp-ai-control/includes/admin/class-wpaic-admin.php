@@ -275,31 +275,44 @@ class WPAIC_Admin {
 
             <hr>
             <h3><?php esc_html_e( 'MCP Configuration', 'wp-ai-control' ); ?></h3>
-            <p><?php esc_html_e( 'Deploy the Node package wp-ai-control-mcp to Railway (or another host). Set WP_URL and WP_API_KEY in the hosting environment so the MCP server can call this WordPress site. Then point Cursor or Claude at the public MCP URL (Streamable HTTP, path /mcp by default).', 'wp-ai-control' ); ?></p>
-            <p><strong><?php esc_html_e( 'Recommended — Cursor / Claude (Railway URL)', 'wp-ai-control' ); ?></strong><br>
-            <?php esc_html_e( 'Replace YOUR-RAILWAY-HOST with your deployment hostname (HTTPS, include /mcp). You can also set environment variable WPAIC_MCP_URL to that URL and use "${env:WPAIC_MCP_URL}" in Cursor mcp.json.', 'wp-ai-control' ); ?></p>
-            <pre style="background:#1e1e1e;color:#d4d4d4;padding:16px;border-radius:4px;overflow:auto;font-size:13px;">{
-  "mcpServers": {
-    "wp-ai-control": {
-      "url": "https://YOUR-RAILWAY-HOST.up.railway.app/mcp"
-    }
-  }
-}</pre>
-            <p><strong><?php esc_html_e( 'Alternative — Local stdio (development)', 'wp-ai-control' ); ?></strong><br>
-            <?php esc_html_e( 'Run the MCP on your machine with Node; use MCP_TRANSPORT=stdio (default outside Railway). Replace PATH/TO with the path to index.js.', 'wp-ai-control' ); ?></p>
-            <pre style="background:#1e1e1e;color:#d4d4d4;padding:16px;border-radius:4px;overflow:auto;font-size:13px;">{
-  "mcpServers": {
-    "wp-ai-control": {
-      "command": "node",
-      "args": ["PATH/TO/wp-ai-control-mcp/index.js"],
-      "env": {
-        "WP_URL": "<?php echo esc_html( get_site_url() ); ?>",
-        "WP_API_KEY": "<?php echo esc_html( $api_key ); ?>"
-      }
-    }
-  }
-}</pre>
-            <p><?php esc_html_e( 'Do not use npx -y wp-ai-control-mcp — that package name is not published on the public npm registry. Health check for the HTTP server: GET /health on the same host.', 'wp-ai-control' ); ?></p>
+            <?php
+            /**
+             * Public URL of the hosted wp-ai-control MCP server (Streamable HTTP, multi-tenant).
+             * Override per deployment with: add_filter( 'wpaic_mcp_url', fn() => 'https://your-host/mcp' );
+             */
+            $mcp_url = apply_filters( 'wpaic_mcp_url', 'https://wp-ai-control-production.up.railway.app/mcp' );
+            $mcp_config_json = wp_json_encode(
+                array(
+                    'mcpServers' => array(
+                        'wp-ai-control' => array(
+                            'url' => $mcp_url,
+                        ),
+                    ),
+                ),
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            );
+            ?>
+            <p><?php esc_html_e( 'Multi-tenant hosted MCP server. Paste this snippet into Cursor (.cursor/mcp.json) or Claude Desktop (claude_desktop_config.json). Each tool call must include this site URL and your API Key (shown above).', 'wp-ai-control' ); ?></p>
+            <p>
+                <strong><?php esc_html_e( 'MCP endpoint:', 'wp-ai-control' ); ?></strong>
+                <code><?php echo esc_html( $mcp_url ); ?></code>
+                <button type="button" class="button button-small"
+                        onclick="navigator.clipboard.writeText('<?php echo esc_js( $mcp_url ); ?>');this.innerText='<?php echo esc_js( __( 'Copied!', 'wp-ai-control' ) ); ?>';setTimeout(()=>this.innerText='<?php echo esc_js( __( 'Copy URL', 'wp-ai-control' ) ); ?>',1500);">
+                    <?php esc_html_e( 'Copy URL', 'wp-ai-control' ); ?>
+                </button>
+            </p>
+            <p style="margin-top:14px;"><strong><?php esc_html_e( 'Client config (Cursor / Claude Desktop):', 'wp-ai-control' ); ?></strong>
+                <button type="button" class="button button-small"
+                        onclick="navigator.clipboard.writeText(document.getElementById('wpaic-mcp-config').innerText);this.innerText='<?php echo esc_js( __( 'Copied!', 'wp-ai-control' ) ); ?>';setTimeout(()=>this.innerText='<?php echo esc_js( __( 'Copy JSON', 'wp-ai-control' ) ); ?>',1500);">
+                    <?php esc_html_e( 'Copy JSON', 'wp-ai-control' ); ?>
+                </button>
+            </p>
+            <pre id="wpaic-mcp-config" style="background:#1e1e1e;color:#d4d4d4;padding:16px;border-radius:4px;overflow:auto;font-size:13px;"><?php echo esc_html( $mcp_config_json ); ?></pre>
+            <p class="description">
+                <?php esc_html_e( 'Health check:', 'wp-ai-control' ); ?>
+                <code><?php echo esc_html( preg_replace( '#/mcp/?$#', '/health', $mcp_url ) ); ?></code> →
+                <code>{"ok":true,"service":"wp-ai-control-mcp"}</code>.
+            </p>
 
             <?php endif; ?>
         </div>
