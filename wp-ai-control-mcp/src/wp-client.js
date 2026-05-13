@@ -7,8 +7,15 @@ export async function wpFetch(path, { method = 'GET', body = null, params = {}, 
   if (!url || !apiKey) {
     throw new Error('site_url and api_key are required. Pass them as arguments or set WP_URL and WP_API_KEY environment variables.');
   }
-  
-  url = `${url.replace(/\/$/, '')}/wp-json/wp-ai-control/v1${path}`;
+
+  const trimmed = url.replace(/\/$/, '');
+  const apiBase = '/wp-json/wp-ai-control/v1';
+  const relPath = path.startsWith('/') ? path : `/${path}`;
+  if (trimmed.endsWith(apiBase)) {
+    url = `${trimmed}${relPath}`;
+  } else {
+    url = `${trimmed}${apiBase}${relPath}`;
+  }
 
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -36,19 +43,26 @@ export async function wpFetch(path, { method = 'GET', body = null, params = {}, 
   }
 
   const response = await fetch(url, options);
+  const text = await response.text();
 
   if (!response.ok) {
-    const errorText = await response.text();
     let errorData;
     try {
-      errorData = JSON.parse(errorText);
+      errorData = JSON.parse(text);
     } catch {
-      errorData = { message: errorText };
+      errorData = { message: text };
     }
     throw new Error(
       `WP API Error (${response.status}): ${errorData.message || errorData.code || 'Unknown error'}`
     );
   }
 
-  return response.json();
+  if (!text) {
+    return {};
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { _raw: text };
+  }
 }

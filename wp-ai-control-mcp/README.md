@@ -8,16 +8,32 @@ MCP (Model Context Protocol) server that connects AI assistants (Claude, Cursor,
 AI Assistant (Claude/Cursor/etc)  <--MCP-->  wp-ai-control-mcp  <--REST API-->  WP AI Control Plugin  <--->  WordPress
 ```
 
-## Installation
+## Production: Railway (Streamable HTTP)
+
+The recommended setup is to deploy this folder to **Railway** so the MCP speaks **Streamable HTTP** on **`/mcp`**. WordPress credentials (`WP_URL`, `WP_API_KEY`) are **only** on the Railway service.
+
+See **`DEPLOY-RAILWAY.md`** for step-by-step instructions.
+
+**Client (Cursor):** set environment variable `WPAIC_MCP_URL` to `https://<your-host>/mcp` and use the monorepo `.cursor/mcp.json` (`"url": "${env:WPAIC_MCP_URL}"`).
+
+**Health check:** `GET https://<your-host>/health` → `{"ok":true,"service":"wp-ai-control-mcp"}`.
+
+HTTP mode is selected when `MCP_TRANSPORT=http` **or** when `RAILWAY_ENVIRONMENT` is set (unless `MCP_TRANSPORT=stdio`). Outside Railway, the default is **stdio** for local `node index.js`.
+
+## Installation (local or Railway build)
 
 ```bash
 cd wp-ai-control-mcp
 npm install
 ```
 
+On `npm install`, a `postinstall` script creates `.env` from `.env.example` if `.env` is missing. Edit `.env` with your real `WP_URL` and `WP_API_KEY` (required for the server to call WordPress).
+
+**Do not** rely on `npx -y wp-ai-control-mcp` from the public npm registry: this package ships with the Git repository.
+
 ## Configuration
 
-Copy the example env file and configure it:
+If you skipped `npm install` or removed `.env`, copy the example and configure it:
 
 ```bash
 cp .env.example .env
@@ -34,7 +50,44 @@ You can generate an API key from your WordPress admin at **Settings > WP AI Cont
 
 ## Usage with Claude Desktop
 
-Add to your `claude_desktop_config.json`:
+**Remote (Railway):**
+
+```json
+{
+  "mcpServers": {
+    "wp-ai-control": {
+      "url": "https://YOUR-RAILWAY-HOST.up.railway.app/mcp"
+    }
+  }
+}
+```
+
+**Local stdio (development):**
+
+```json
+{
+  "mcpServers": {
+    "wp-ai-control": {
+      "command": "node",
+      "args": ["/full/path/to/wp-ai-control-mcp/index.js"],
+      "env": {
+        "WP_URL": "https://your-site.com",
+        "WP_API_KEY": "wpaic_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    }
+  }
+}
+```
+
+## Usage with Cursor
+
+**Recommended:** deploy to Railway, then set **`WPAIC_MCP_URL`** on your machine to `https://<host>/mcp` and use the repo `.cursor/mcp.json` with `"url": "${env:WPAIC_MCP_URL}"`.
+
+**Local stdio:** same `command` / `node` / `args` / `env` block as Claude Desktop local example above, or `envFile` pointing at `wp-ai-control-mcp/.env` with `MCP_TRANSPORT=stdio` if you run the binary locally.
+
+## Usage with Cline (VS Code)
+
+Add to your VS Code settings or `.vscode/mcp.json`:
 
 ```json
 {
@@ -51,35 +104,7 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-## Usage with Cursor
-
-Add to your `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "wp-ai-control": {
-      "command": "node",
-      "args": ["/ruta/completa/wp-ai-control-mcp/index.js"]
-    }
-  }
-}
-```
-
-## Usage with Cline (VS Code)
-
-Add to your VS Code settings or `.vscode/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "wp-ai-control": {
-      "command": "node",
-      "args": ["/ruta/completa/wp-ai-control-mcp/index.js"]
-    }
-  }
-}
-```
+Or use `"envFile"` pointing at your `.env` file.
 
 ## Test Connection
 

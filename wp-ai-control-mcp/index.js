@@ -1,76 +1,31 @@
 #!/usr/bin/env node
 import 'dotenv/config';
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
-import { wpFetch } from './src/wp-client.js';
-import { tools } from './src/tools/index.js';
+import { createWpaicMcpServer } from './src/create-wpaic-server.js';
+import { startHttpMcpServer } from './src/http-mcp.js';
 
-const server = new Server(
-  { name: 'wp-ai-control-mcp', version: '1.1.0' },
-  { capabilities: { tools: {} } }
-);
-
-server.setRequestHandler(ListToolsRequestSchema, async () => {
-  return { tools };
-});
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const { name, arguments: args = {} } = request.params;
-
-  const tool = tools.find((t) => t.name === name);
-  if (!tool) {
-    return {
-      content: [{ type: 'text', text: `Tool ${name} not found.` }],
-      isError: true,
-    };
+function useHttpMode() {
+  if (process.env.MCP_TRANSPORT === 'http') {
+    return true;
   }
-
-  let path = tool._path;
-  const method = tool._method;
-  const pathParams = tool._pathParams || [];
-  const bodyParams = tool._bodyParams || [];
-
-  let pathArgs = { ...args };
-  let queryArgs = {};
-  let bodyArgs = {};
-
-  const site_url = pathArgs.site_url;
-  const api_key = pathArgs.api_key;
-  delete pathArgs.site_url;
-  delete pathArgs.api_key;
-
-  for (const param of pathParams) {
-    if (pathArgs[param] !== undefined) {
-      path = path.replace(`{${param}}`, String(pathArgs[param]));
-      delete pathArgs[param];
-    }
+  if (process.env.MCP_TRANSPORT === 'stdio') {
+    return false;
   }
+  return Boolean(process.env.RAILWAY_ENVIRONMENT);
+}
 
-  for (const param of bodyParams) {
-    if (pathArgs[param] !== undefined) {
-      bodyArgs[param] = pathArgs[param];
-      delete pathArgs[param];
-    }
+if (useHttpMode()) {
+  if (!process.env.WP_URL || !process.env.WP_API_KEY) {
+    console.error(
+      '[wp-ai-control-mcp] Running in HTTP mode without default WP_URL/WP_API_KEY. ' +
+        'Each tool call MUST supply site_url and api_key (multi-tenant mode).'
+    );
+  } else {
+    console.error('[wp-ai-control-mcp] HTTP mode with default WP credentials from environment (single-tenant fallback).');
   }
-
-  queryArgs = pathArgs;
-
-  try {
-    const result = await wpFetch(path, { method, body: bodyArgs, params: queryArgs, site_url, api_key });
-    return {
-      content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
-    };
-  } catch (error) {
-    return {
-      content: [{ type: 'text', text: error.message }],
-      isError: true,
-    };
-  }
-});
-
-const transport = new StdioServerTransport();
-await server.connect(transport);
+  await startHttpMcpServer();
+} else {
+  const server = createWpaicMcpServer();
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+}

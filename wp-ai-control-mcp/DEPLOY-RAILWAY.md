@@ -1,59 +1,78 @@
-# Deploy a Railway.app
+# Despliegue en Railway (MCP por HTTP)
 
-## Pasos
+El servidor MCP expone **Streamable HTTP** (MCP spec) en **`/mcp`**. Es **multi-tenant**: cada llamada a una tool incluye `site_url` y `api_key`, por lo que **no necesita** credenciales globales en Railway. Opcionalmente se pueden definir `WP_URL`/`WP_API_KEY` como fallback single-tenant.
 
-### 1. Subir a GitHub
-```bash
-cd wp-ai-control-mcp
-git init
-git add .
-git commit -m "MCP Server"
-# Crear repo en GitHub y push
+## 1. Repositorio
+
+Sube el monorepo a GitHub (o usa el repo existente). En Railway no hace falta un repo solo con la carpeta del MCP.
+
+## 2. Nuevo servicio en Railway
+
+1. [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**
+2. Selecciona el repositorio.
+3. En el servicio → **Settings** → **Root Directory**: `wp-ai-control-mcp`
+4. **Build** / **Start**: Railway ejecutará `npm install` y `npm start` (ver `package.json`).
+
+## 3. Variables de entorno
+
+**Ninguna es obligatoria en modo multi-tenant.** El servidor arranca igual y cada cliente pasa sus credenciales por tool call.
+
+Opcionales:
+
+| Variable | Descripción |
+|----------|-------------|
+| `WP_URL` | Fallback single-tenant: raíz del sitio (ej. `https://tu-sitio.com`) o URL hasta `/wp-json/wp-ai-control/v1`. Si se define, se usa cuando una tool no manda `site_url`. |
+| `WP_API_KEY` | Fallback single-tenant: API key del plugin (WP Admin → WP AI Control). Pareja con `WP_URL`. |
+| `MCP_TRANSPORT` | `http` fuerza HTTP; `stdio` fuerza stdio (útil en Railway solo en casos raros). Si no está definido y existe `RAILWAY_ENVIRONMENT`, se usa HTTP. |
+| `PORT` | Lo asigna Railway automáticamente. |
+| `MCP_PATH` | Por defecto `/mcp`. |
+| `MCP_ALLOWED_HOSTS` | Lista separada por comas de `Host` permitidos (protección DNS rebinding). Ej.: `tu-app.up.railway.app` |
+
+Tras el deploy, anota la URL pública HTTPS, por ejemplo: `https://wp-ai-control-mcp-production-xxxx.up.railway.app`.
+
+## 4. Comprobar salud
+
+```text
+GET https://TU-HOST/health
 ```
 
-### 2. Deploy en Railway
-1. Ir a [railway.app](https://railway.app)
-2. Login con GitHub
-3. "New Project" → "Deploy from GitHub repo"
-4. Seleccionar el repo
-5. Variables de entorno:
-   - `WP_URL`: Tu WordPress URL
-   - `WP_API_KEY`: Tu API key del plugin
-6. "Deploy"
+Respuesta esperada: `{"ok":true,"service":"wp-ai-control-mcp"}`.
 
-### 3. Obtener URL
-Railway te dará una URL como: `https://wp-ai-control-mcp.up.railway.app`
+## 5. Cursor (cliente)
 
-### 4. Configurar cliente MCP
+En `.cursor/mcp.json` del proyecto (o en `~/.cursor/mcp.json`):
 
-**Para Cursor/Claude Desktop:**
 ```json
 {
   "mcpServers": {
     "wp-ai-control": {
-      "command": "npx",
-      "args": ["-y", "wp-ai-control-mcp"],
-      "env": {
-        "WP_URL": "https://tu-wordpress.com/wp-json/wp-ai-control/v1",
-        "WP_API_KEY": "tu-key"
-      }
+      "url": "https://TU-HOST.up.railway.app/mcp"
     }
   }
 }
 ```
 
-**O usar como HTTP server (agregar Express):**
-```bash
-npm install express
+O con variable de entorno en tu máquina:
+
+```json
+{
+  "mcpServers": {
+    "wp-ai-control": {
+      "url": "${env:WPAIC_MCP_URL}"
+    }
+  }
+}
 ```
 
-## Costo
+Define `WPAIC_MCP_URL` con la URL completa **incluyendo** `/mcp`.
 
-- **Hobby**: $5/mes
-- **Pro**: $20/mes
+## 6. Claude Desktop
 
-## Notas
+En `claude_desktop_config.json`, misma clave `url` apuntando a `https://.../mcp`.
 
-- MCP funciona mejor como stdio para desarrollo local
-- Railway útil si necesitas HTTP endpoint público
-- El plugin WordPress debe estar instalado y configurado
+## Coste y notas
+
+- **Hobby** / **Pro**: según plan Railway.
+- Modo multi-tenant: cada cliente envía sus credenciales WordPress por tool call (`site_url`, `api_key`). No expongas tokens globales si no es necesario.
+- Modo single-tenant (opcional): define `WP_URL` y `WP_API_KEY` en el servicio y el servidor las usará como fallback cuando una tool no especifique las suyas.
+- Para desarrollo local sin Railway: `MCP_TRANSPORT=stdio` (por defecto fuera de Railway) y `node index.js` con stdio.

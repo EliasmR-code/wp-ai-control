@@ -17,6 +17,23 @@ export default [
     _bodyParams: [],
   },
   {
+    name: "create-page",
+    description: "Create a new WordPress page with title, optional HTML content, and status.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        title: { type: "string", description: "Page title" },
+        content: { type: "string", description: "HTML or block markup (optional)" },
+        status: { type: "string", description: "draft | publish | private (default draft)" },
+      },
+      required: ["title"],
+    },
+    _method: "POST",
+    _path: "/pages",
+    _pathParams: [],
+    _bodyParams: ["title", "content", "status"],
+  },
+  {
     name: "read-page",
     description: "Get full page content including title, status, meta, and builder data.",
     inputSchema: {

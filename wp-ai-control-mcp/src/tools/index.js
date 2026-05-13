@@ -21,31 +21,35 @@ import widgets from './widgets.js';
 import bulk from './bulk.js';
 import woocommerce from './woocommerce.js';
 import acf from './acf.js';
+import rankMath from './rank-math.js';
+
+const withFeature = (items, feature) => items.map((tool) => ({ ...tool, _feature: feature }));
 
 const allTools = [
-  ...context,
-  ...pages,
-  ...posts,
-  ...builder,
-  ...media,
-  ...analysis,
-  ...plugins,
-  ...menus,
-  ...taxonomies,
-  ...snapshots,
-  ...usage,
-  ...users,
-  ...comments,
-  ...mediaAdditional,
-  ...terms,
-  ...settings,
-  ...themes,
-  ...meta,
-  ...search,
-  ...widgets,
-  ...bulk,
-  ...woocommerce,
-  ...acf,
+  ...withFeature(context, 'context'),
+  ...withFeature(pages, 'content'),
+  ...withFeature(posts, 'content'),
+  ...withFeature(builder, 'builders'),
+  ...withFeature(media, 'content'),
+  ...withFeature(analysis, 'analysis'),
+  ...withFeature(plugins, 'plugins'),
+  ...withFeature(menus, 'content'),
+  ...withFeature(taxonomies, 'content'),
+  ...withFeature(snapshots, 'content'),
+  ...withFeature(usage, 'usage'),
+  ...withFeature(users, 'users'),
+  ...withFeature(comments, 'content'),
+  ...withFeature(mediaAdditional, 'content'),
+  ...withFeature(terms, 'content'),
+  ...withFeature(settings, 'settings'),
+  ...withFeature(themes, 'themes'),
+  ...withFeature(meta, 'content'),
+  ...withFeature(search, 'content'),
+  ...withFeature(widgets, 'widgets'),
+  ...withFeature(bulk, 'content'),
+  ...withFeature(woocommerce, 'woocommerce'),
+  ...withFeature(acf, 'acf'),
+  ...withFeature(rankMath, 'rank_math'),
 ];
 
 const sharedProps = {

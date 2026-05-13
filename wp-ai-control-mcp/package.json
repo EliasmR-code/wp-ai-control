@@ -3,11 +3,33 @@
   "version": "1.0.0",
   "type": "module",
   "description": "MCP server for WP AI Control WordPress plugin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EliasmR-code/wp-ai-control.git",
+    "directory": "wp-ai-control-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/EliasmR-code/wp-ai-control/issues"
+  },
+  "homepage": "https://github.com/EliasmR-code/wp-ai-control/tree/main/wp-ai-control-mcp",
+  "keywords": [
+    "mcp",
+    "wordpress",
+    "wp-ai-control",
+    "model-context-protocol"
+  ],
+  "files": [
+    "index.js",
+    "src",
+    "scripts/ensure-env.mjs",
+    ".env.example"
+  ],
   "main": "index.js",
   "bin": {
     "wp-ai-control-mcp": "./index.js"
   },
   "scripts": {
+    "postinstall": "node scripts/ensure-env.mjs",
     "start": "node index.js",
     "dev": "node --watch index.js"
   },
@@ -17,6 +39,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "dotenv": "^16.4.0",
+    "express": "^5.0.0",
     "node-fetch": "^3.3.0"
   }
 }
