@@ -27,10 +27,10 @@ Sube el monorepo a GitHub (o usa el repo existente). En Railway no hace falta un
 | `MCP_TRANSPORT` | `http` fuerza HTTP; `stdio` fuerza stdio. Si no está definido y existe `RAILWAY_ENVIRONMENT`, se usa HTTP. |
 | `PORT` | Lo asigna Railway automáticamente. |
 | `MCP_PATH` | Por defecto `/mcp`. |
-| `MCP_ALLOWED_HOSTS` | **Recomendado en producción:** lista separada por comas del `Host` público (p. ej. `tu-app.up.railway.app`) para mitigar DNS rebinding. |
+| `MCP_ALLOWED_HOSTS` | Opcional. Si el `Host` que ve Express no coincide exactamente (proxies, clientes), el MCP puede fallar; déjalo vacío salvo que controles el `Host` público. |
 | `TRUST_PROXY` | Por defecto el servidor confía en el proxy (`1`). En `0` desactiva `trust proxy` de Express. |
 | `WP_FETCH_TIMEOUT_MS` | Timeout hacia WordPress en ms (por defecto 60000, máximo 300000). |
-| `WP_FETCH_USER_AGENT` | Cabecera `User-Agent` hacia WordPress (opcional). |
+| `MCP_JSON_RESPONSE` | `1` fuerza respuestas JSON (menos SSE). En Railway por defecto queda **activado** salvo que pongas `MCP_JSON_RESPONSE=0` (modo SSE clásico). Ayuda a Cursor cuando el GET/SSE devuelve 404 por sesión. |
 
 Tras el deploy, anota la URL pública HTTPS, por ejemplo: `https://wp-ai-control-mcp-production-xxxx.up.railway.app`.
 

@@ -56,7 +56,7 @@ function sanitizeTool(tool) {
  */
 export function createWpaicMcpServer() {
   const server = new Server(
-    { name: 'wp-ai-control-mcp', version: '1.1.1' },
+    { name: 'wp-ai-control-mcp', version: '1.1.2' },
     { capabilities: { tools: {} } }
   );
 
