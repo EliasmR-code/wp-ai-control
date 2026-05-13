@@ -1,0 +1,3 @@
+# Cuando Railway construye desde la raíz del monorepo, sin "Root Directory" = wp-ai-control-mcp,
+# Nixpacks puede elegir PHP por composer.json (php-mcp). Este servicio MCP es Node.
+providers = ["node"]
