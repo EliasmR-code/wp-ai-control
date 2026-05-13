@@ -53,7 +53,7 @@ export async function wpFetch(path, { method = 'GET', body = null, params = {}, 
       errorData = { message: text };
     }
     throw new Error(
-      `WP API Error (${response.status}): ${errorData.message || errorData.code || 'Unknown error'}`
+      `WP API Error (${response.status}): ${errorData.error || errorData.message || errorData.code || 'Unknown error'}`
     );
   }
 
