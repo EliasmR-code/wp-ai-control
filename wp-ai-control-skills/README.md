@@ -11,7 +11,7 @@ npm install
 
 ## Configuration
 
-Set environment variables:
+Set environment variables (`WP_URL` may be the site root or the full base ending in `/wp-json/wp-ai-control/v1`; the skills server appends paths like `/content/analyze` to `WP_URL`):
 
 ```bash
 export WP_URL=http://your-wordpress.com/wp-json/wp-ai-control/v1

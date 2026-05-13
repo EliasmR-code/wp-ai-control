@@ -1,0 +1,11 @@
+# https://docs.railway.com/reference/config-as-code
+# Root Directory del servicio en Railway debe ser: wp-ai-control-mcp
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/health"
+healthcheckTimeout = 45
+restartPolicyType = "ON_FAILURE"

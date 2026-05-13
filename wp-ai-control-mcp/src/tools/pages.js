@@ -18,20 +18,22 @@ export default [
   },
   {
     name: "create-page",
-    description: "Create a new WordPress page with title, optional HTML content, and status.",
+    description: "Create a new WordPress page with title, optional HTML content, status, optional parent page ID, and optional slug (post_name).",
     inputSchema: {
       type: "object",
       properties: {
         title: { type: "string", description: "Page title" },
         content: { type: "string", description: "HTML or block markup (optional)" },
         status: { type: "string", description: "draft | publish | private (default draft)" },
+        parent: { type: "number", description: "Parent page ID for nested URLs (optional)" },
+        slug: { type: "string", description: "URL slug (post_name), without slashes (optional)" },
       },
       required: ["title"],
     },
     _method: "POST",
     _path: "/pages",
     _pathParams: [],
-    _bodyParams: ["title", "content", "status"],
+    _bodyParams: ["title", "content", "status", "parent", "slug"],
   },
   {
     name: "read-page",
@@ -50,7 +52,7 @@ export default [
   },
   {
     name: "update-page",
-    description: "Update a page's title, content, or status.",
+    description: "Update a page's title, content, status, parent, or slug.",
     inputSchema: {
       type: "object",
       properties: {
@@ -58,13 +60,15 @@ export default [
         title: { type: "string", description: "New title" },
         content: { type: "string", description: "New content" },
         status: { type: "string", description: "New status (publish, draft, private)" },
+        parent: { type: "number", description: "Parent page ID (0 for top-level)" },
+        slug: { type: "string", description: "New URL slug (post_name)" },
       },
       required: ["id"],
     },
     _method: "PUT",
     _path: "/pages/{id}",
     _pathParams: ["id"],
-    _bodyParams: ["title", "content", "status"],
+    _bodyParams: ["title", "content", "status", "parent", "slug"],
   },
   {
     name: "delete-page",

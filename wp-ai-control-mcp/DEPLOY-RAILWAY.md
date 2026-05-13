@@ -11,22 +11,26 @@ Sube el monorepo a GitHub (o usa el repo existente). En Railway no hace falta un
 1. [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**
 2. Selecciona el repositorio.
 3. En el servicio → **Settings** → **Root Directory**: `wp-ai-control-mcp`
-4. **Build** / **Start**: Railway ejecutará `npm install` y `npm start` (ver `package.json`).
+4. Opcional: el repo incluye `railway.toml` con healthcheck en `/health` y arranque `npm start`.
+5. **Build** / **Start**: Railway ejecutará `npm install` y `npm start` (ver `package.json`).
 
 ## 3. Variables de entorno
 
-**Ninguna es obligatoria en modo multi-tenant.** El servidor arranca igual y cada cliente pasa sus credenciales por tool call.
+**MCP compartido (recomendado para “cualquier usuario”):** deja **sin definir** `WP_URL` y `WP_API_KEY`. Cada cliente (Cursor, etc.) pasa `site_url` y `api_key` en cada llamada a una tool. El servidor ya **no filtra** el listado de herramientas por el plan de un solo sitio.
 
-Opcionales:
+**Servidor dedicado a un solo WordPress:** puedes definir `WP_URL` y `WP_API_KEY` como respaldo cuando una tool no envíe credenciales.
 
 | Variable | Descripción |
 |----------|-------------|
-| `WP_URL` | Fallback single-tenant: raíz del sitio (ej. `https://tu-sitio.com`) o URL hasta `/wp-json/wp-ai-control/v1`. Si se define, se usa cuando una tool no manda `site_url`. |
-| `WP_API_KEY` | Fallback single-tenant: API key del plugin (WP Admin → WP AI Control). Pareja con `WP_URL`. |
-| `MCP_TRANSPORT` | `http` fuerza HTTP; `stdio` fuerza stdio (útil en Railway solo en casos raros). Si no está definido y existe `RAILWAY_ENVIRONMENT`, se usa HTTP. |
+| `WP_URL` | Opcional. Fallback single-tenant. |
+| `WP_API_KEY` | Opcional. API key del plugin (pareja con `WP_URL`). |
+| `MCP_TRANSPORT` | `http` fuerza HTTP; `stdio` fuerza stdio. Si no está definido y existe `RAILWAY_ENVIRONMENT`, se usa HTTP. |
 | `PORT` | Lo asigna Railway automáticamente. |
 | `MCP_PATH` | Por defecto `/mcp`. |
-| `MCP_ALLOWED_HOSTS` | Lista separada por comas de `Host` permitidos (protección DNS rebinding). Ej.: `tu-app.up.railway.app` |
+| `MCP_ALLOWED_HOSTS` | **Recomendado en producción:** lista separada por comas del `Host` público (p. ej. `tu-app.up.railway.app`) para mitigar DNS rebinding. |
+| `TRUST_PROXY` | Por defecto el servidor confía en el proxy (`1`). En `0` desactiva `trust proxy` de Express. |
+| `WP_FETCH_TIMEOUT_MS` | Timeout hacia WordPress en ms (por defecto 60000, máximo 300000). |
+| `WP_FETCH_USER_AGENT` | Cabecera `User-Agent` hacia WordPress (opcional). |
 
 Tras el deploy, anota la URL pública HTTPS, por ejemplo: `https://wp-ai-control-mcp-production-xxxx.up.railway.app`.
 
@@ -73,6 +77,6 @@ En `claude_desktop_config.json`, misma clave `url` apuntando a `https://.../mcp`
 ## Coste y notas
 
 - **Hobby** / **Pro**: según plan Railway.
-- Modo multi-tenant: cada cliente envía sus credenciales WordPress por tool call (`site_url`, `api_key`). No expongas tokens globales si no es necesario.
+- Modo multi-tenant: cada cliente envía sus credenciales WordPress por tool call (`site_url`, `api_key`). En un MCP público **no** pongas `WP_URL`/`WP_API_KEY` en Railway salvo que el servicio sea solo para un sitio.
 - Modo single-tenant (opcional): define `WP_URL` y `WP_API_KEY` en el servicio y el servidor las usará como fallback cuando una tool no especifique las suyas.
 - Para desarrollo local sin Railway: `MCP_TRANSPORT=stdio` (por defecto fuera de Railway) y `node index.js` con stdio.

@@ -15,6 +15,10 @@ export function createHttpMcpApp() {
     allowedHosts?.length > 0
       ? createMcpExpressApp({ host: '0.0.0.0', allowedHosts })
       : createMcpExpressApp({ host: '0.0.0.0' });
+  // Railway / reverse proxies: correct Host, IP, and optional MCP_ALLOWED_HOSTS checks
+  if (process.env.TRUST_PROXY !== '0') {
+    app.set('trust proxy', 1);
+  }
   const transports = {};
 
   app.get('/health', (_req, res) => {

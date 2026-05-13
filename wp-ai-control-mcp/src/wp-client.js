@@ -1,5 +1,7 @@
 import fetch from 'node-fetch';
 
+const DEFAULT_TIMEOUT_MS = 60000;
+
 export async function wpFetch(path, { method = 'GET', body = null, params = {}, site_url = null, api_key = null } = {}) {
   let url = site_url || process.env.WP_URL;
   let apiKey = api_key || process.env.WP_API_KEY;
@@ -7,6 +9,11 @@ export async function wpFetch(path, { method = 'GET', body = null, params = {}, 
   if (!url || !apiKey) {
     throw new Error('site_url and api_key are required. Pass them as arguments or set WP_URL and WP_API_KEY environment variables.');
   }
+
+  const timeoutMs = Math.min(
+    300000,
+    Math.max(5000, parseInt(process.env.WP_FETCH_TIMEOUT_MS || String(DEFAULT_TIMEOUT_MS), 10) || DEFAULT_TIMEOUT_MS)
+  );
 
   const trimmed = url.replace(/\/$/, '');
   const apiBase = '/wp-json/wp-ai-control/v1';
@@ -31,18 +38,27 @@ export async function wpFetch(path, { method = 'GET', body = null, params = {}, 
   const headers = {
     'Authorization': `Bearer ${apiKey}`,
     'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'User-Agent': process.env.WP_FETCH_USER_AGENT || 'wp-ai-control-mcp/1.1 (+https://github.com/EliasmR-code/wp-ai-control)',
   };
 
   const options = {
     method,
     headers,
+    signal: AbortSignal.timeout(timeoutMs),
   };
 
   if (body && (method === 'POST' || method === 'PUT')) {
     options.body = JSON.stringify(body);
   }
 
-  const response = await fetch(url, options);
+  let response;
+  try {
+    response = await fetch(url, options);
+  } catch (e) {
+    const msg = e && e.name === 'TimeoutError' ? `Request timed out after ${timeoutMs}ms` : (e && e.message) || String(e);
+    throw new Error(`WP fetch failed: ${msg}`);
+  }
   const text = await response.text();
 
   if (!response.ok) {

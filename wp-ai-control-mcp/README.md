@@ -10,9 +10,13 @@ AI Assistant (Claude/Cursor/etc)  <--MCP-->  wp-ai-control-mcp  <--REST API-->  
 
 ## Production: Railway (Streamable HTTP)
 
-The recommended setup is to deploy this folder to **Railway** so the MCP speaks **Streamable HTTP** on **`/mcp`**. WordPress credentials (`WP_URL`, `WP_API_KEY`) are **only** on the Railway service.
+The recommended setup is to deploy this folder to **Railway** so the MCP speaks **Streamable HTTP** on **`/mcp`**.
 
-See **`DEPLOY-RAILWAY.md`** for step-by-step instructions.
+**Multi-tenant (default):** each tool call from the AI client includes `site_url` and `api_key`. The Railway service **does not need** global `WP_URL` / `WP_API_KEY` (leave them unset on a shared MCP so every user uses their own WordPress).
+
+**Single-tenant (optional):** set `WP_URL` and `WP_API_KEY` on Railway only if this deployment is dedicated to one WordPress site (fallback when a tool omits credentials).
+
+See **`DEPLOY-RAILWAY.md`** for step-by-step instructions (includes `railway.toml` health check on `/health`).
 
 **Client (Cursor):** set environment variable `WPAIC_MCP_URL` to `https://<your-host>/mcp` and use the monorepo `.cursor/mcp.json` (`"url": "${env:WPAIC_MCP_URL}"`).
 
@@ -27,7 +31,7 @@ cd wp-ai-control-mcp
 npm install
 ```
 
-On `npm install`, a `postinstall` script creates `.env` from `.env.example` if `.env` is missing. Edit `.env` with your real `WP_URL` and `WP_API_KEY` (required for the server to call WordPress).
+On `npm install`, a `postinstall` script creates `.env` from `.env.example` if `.env` is missing. For **local stdio** testing against one site, edit `.env` with `WP_URL` and `WP_API_KEY`. For **Railway multi-tenant**, you can leave those blank and pass credentials per tool call from Cursor.
 
 **Do not** rely on `npx -y wp-ai-control-mcp` from the public npm registry: this package ships with the Git repository.
 

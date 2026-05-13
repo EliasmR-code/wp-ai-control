@@ -2,7 +2,12 @@ import fetch from 'node-fetch';
 
 export class WPClient {
   constructor(url, apiKey) {
-    this.baseUrl = url.replace(/\/$, '');
+    let base = String(url).replace(/\/$/, '');
+    const apiSuffix = '/wp-json/wp-ai-control/v1';
+    if (base.endsWith(apiSuffix)) {
+      base = base.slice(0, -apiSuffix.length).replace(/\/$/, '');
+    }
+    this.baseUrl = base;
     this.apiKey = apiKey;
   }
 
@@ -37,7 +42,7 @@ export class WPClient {
 
   async request(url, { method = 'GET', body = null } = {}) {
     const headers = {
-      'X-WPAIC-API-Key': this.apiKey,
+      Authorization: `Bearer ${this.apiKey}`,
       'Content-Type': 'application/json',
     };
 
@@ -47,13 +52,23 @@ export class WPClient {
     }
 
     const response = await fetch(url, options);
+    const text = await response.text();
     if (!response.ok) {
-      const errorText = await response.text();
       let errorData;
-      try { errorData = JSON.parse(errorText); } catch { errorData = { message: errorText }; }
-      throw new Error(`WP API Error (${response.status}): ${errorData.message || 'Unknown error'}`);
+      try {
+        errorData = JSON.parse(text);
+      } catch {
+        errorData = { message: text };
+      }
+      throw new Error(`WP API Error (${response.status}): ${errorData.message || errorData.code || 'Unknown error'}`);
     }
-
-    return response.json();
+    if (!text) {
+      return {};
+    }
+    try {
+      return JSON.parse(text);
+    } catch {
+      return { _raw: text };
+    }
   }
 }

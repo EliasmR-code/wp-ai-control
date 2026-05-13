@@ -1,170 +1,96 @@
 # WP AI Control CLI
 
-A command-line interface for managing WordPress sites via the WP AI Control plugin. Provides 27+ commands for pages, posts, media, WooCommerce, ACF, widgets, and more.
+Interfaz de línea de comandos para el plugin **WP AI Control**: llama a la REST API (`/wp-json/wp-ai-control/v1`) con la API key en `Authorization: Bearer`.
 
-## Installation
+## Requisitos
 
-```bash
-npm install -g wp-ai-control-cli
-```
+- Node.js 18+
+- Plugin WP AI Control activo y API key válida (licencia según plan del sitio)
 
-Or use directly without installing:
+## Instalación
 
-```bash
-npx wp-ai-control-cli <command>
-```
-
-## Quick Start
-
-### 1. Setup (creates `.wpai` config file)
+Desde esta carpeta:
 
 ```bash
-wpai setup
+npm install
+npm link
 ```
 
-You'll be prompted for:
-- WordPress URL
-- API Key (generated from Settings > WP AI Control)
-
-### 2. Use commands
+O ejecutar sin instalar globalmente:
 
 ```bash
-# List pages
-wpai pages
-
-# Search posts
-wpai posts -s "news"
-
-# Read a page
-wpai page-read 123
-
-# Update a post
-wpai post-update 456 -t "New Title" -c "New content"
-
-# Install a plugin
-wpai plugin-install contact-form-7
-
-# WooCommerce: list products
-wpai products
-
-# ACF: list field groups
-wpai acf-field-groups
-
-# Widgets: list sidebars
-wpai sidebars
+node bin/wpai.js --help
 ```
 
-## All Commands
+## Configuración
 
-### Setup
-- `setup` - Interactive setup wizard (creates `.wpai`)
+**`WP_URL`**: raíz del sitio (recomendado), por ejemplo `https://yoursite.com`. También puedes usar la URL completa hasta `.../wp-json/wp-ai-control/v1`; el cliente la normaliza.
 
-### Pages (5 commands)
-- `pages` - List pages (with search, pagination)
-- `page-read <id>` - Read a page
-- `page-update <id>` - Update page (--title, --content, --status)
-- `page-delete <id>` - Delete page (use --force)
-- `page-duplicate <id>` - Duplicate a page
+**`WP_API_KEY`**: la clave del plugin (prefijo típico `wpaic_`).
 
-### Posts (4 commands)
-- `posts` - List posts
-- `post-read <id>` - Read a post
-- `post-update <id>` - Update post
-- `post-delete <id>` - Delete post
+Opciones:
 
-### Site Info (2 commands)
-- `site-info` - Get WordPress site information
-- `builder-info` - Detect active page builder
-
-### Users (2 commands)
-- `users` - List all users
-- `user-create <username> <email>` - Create a user
-
-### Comments (2 commands)
-- `comments` - List comments
-- `comment-approve <id>` - Approve a comment
-
-### Media (1 command)
-- `media` - List media files
-
-### WooCommerce (2 commands)
-- `products` - List products
-- `product-create <name>` - Create a product
-
-### Plugins (3 commands)
-- `plugins` - List installed plugins
-- `plugin-install <slug>` - Install plugin
-- `plugin-activate <slug>` - Activate plugin
-
-### Themes (2 commands)
-- `themes` - List installed themes
-- `theme-activate <slug>` - Activate theme
-
-### Analysis (2 commands)
-- `analyze-seo <page_id>` - SEO analysis
-- `analyze-performance <page_id>` - Performance analysis
-
-### Menus (1 command)
-- `menus` - List navigation menus
-
-### API Keys (2 commands)
-- `api-keys` - List API keys
-- `api-key-generate <name>` - Generate new API key
-
-### Bulk Operations (1 command)
-- `bulk-update-posts` - Update multiple posts
-
-### Widgets (2 commands)
-- `widgets` - List all widgets
-- `sidebars` - List sidebars
-
-### ACF (2 commands)
-- `acf-field-groups` - List ACF field groups
-- `acf-fields <group_id>` - List fields in group
-
-### Raw API (1 command)
-- `run <command>` - Run raw API command (--method, --body)
-
-## Examples
-
-```bash
-# Export all pages to JSON
-wpai export pages.json -t pages
-
-# Import data from JSON
-wpai import data.json -t posts
-
-# Bulk update posts
-wpai bulk-update-posts -i "123,456,789" -t "New Title"
-
-# Run raw API call
-wpai run "/wc/orders" -m GET
-
-# Use with different config
-WP_URL=https://other-site.com wpai pages
-```
-
-## Configuration
-
-The CLI reads from `.wpai` file in current directory:
+1. Archivo **`.wpai`** en el directorio de trabajo (lo crea `wpai setup`):
 
 ```
 WP_URL=https://yoursite.com
-WP_API_KEY=wpaic_live_xxxxxxxxxxxxxxxxxxxxxxxx
+WP_API_KEY=wpaic_xxxxxxxx
 ```
 
-Or use environment variables:
+2. Variables de entorno:
+
 ```bash
 export WP_URL=https://yoursite.com
-export WP_API_KEY=wpaic_live_xxxxxxxxxxxxxxxxxxxxxxxx
+export WP_API_KEY=wpaic_xxxxxxxx
 ```
 
-## Requirements
+## Uso rápido
 
-- Node.js 18+
-- WP AI Control plugin installed and activated
-- Valid API key with read/write permissions
+```bash
+wpai setup
+wpai site-info
+wpai posts -s "news"
+wpai post-create -t "Hello" -c "<p>Body</p>" --status draft
+wpai pages
+wpai page-create -t "About" -c "..." --status publish
+wpai page-read 42
+wpai run "/wc/orders" -m GET
+wpai bulk-update-posts -i "10,11" -t "New title"
+wpai media-upload --url "https://www.w3.org/Icons/w3c_home.png" --filename "w3c.png" --alt "W3C"
+```
 
-## License
+## Comandos (resumen)
+
+| Área | Comandos |
+|------|----------|
+| Config | `setup` |
+| Sitio | `site-info`, `builder-info` |
+| Posts | `posts`, `post-read`, `post-create`, `post-update`, `post-delete`, `bulk-update-posts`, `bulk-delete-posts` |
+| Páginas | `pages`, `page-read`, `page-create`, `page-update`, `page-delete`, `page-duplicate` |
+| Usuarios | `users`, `user-create` (`-p` / `--password`, `-r` / `--role`) |
+| Medios / comentarios | `media`, `media-upload` (URL remota), `comments`, `comment-approve` |
+| Plugins / temas | `plugins`, `plugin-install`, `plugin-activate`, `plugin-deactivate`, `themes`, `theme-activate` |
+| Menús | `menus`, `menu-read`, `menu-locations` |
+| WooCommerce | `products`, `product-create` |
+| Widgets | `widgets`, `sidebars` |
+| ACF | `acf-field-groups`, `acf-fields` |
+| Análisis | `analyze-seo`, `analyze-performance` |
+| Genérico | `run <path>` con `-m` / `--method` y `-b` / `--body` (JSON) |
+
+Los endpoints de análisis, WooCommerce, ACF o widgets solo existen si el plan del plugin los incluye y la licencia está activa.
+
+## `run` (API arbitraria)
+
+```bash
+wpai run "/posts" -m GET
+wpai run "/bulk-update-posts" -m POST -b "{\"post_ids\":[1],\"updates\":{\"status\":\"draft\"}}"
+```
+
+## Notas
+
+- **Clave API en el admin** (`GET /auth/key`, `POST /auth/key`): exigen sesión de administrador en WordPress (`check_admin`), no bastan el Bearer y la API key del plugin. Para rotar la clave usa el panel de WP AI Control.
+- **Subida de medios**: `POST /media/upload` importa desde una **URL http(s)** (`wpai media-upload --url ...`). No sustituye multipart desde el disco; para archivos locales puedes usar la REST de WordPress o subirlos a una URL accesible.
+
+## Licencia
 
 MIT

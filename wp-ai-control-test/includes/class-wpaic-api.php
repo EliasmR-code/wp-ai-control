@@ -18,7 +18,7 @@ class WPAIC_API {
         register_rest_route( WPAIC_NAMESPACE, '/posts', array( 'methods' => 'GET', 'callback' => array( $this, 'get_posts' ), 'permission_callback' => '__return_true' ));
         register_rest_route( WPAIC_NAMESPACE, '/posts', array( 'methods' => 'POST', 'callback' => array( $this, 'create_post' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
         register_rest_route( WPAIC_NAMESPACE, '/posts/(?P<id>\d+)', array( 'methods' => 'GET', 'callback' => array( $this, 'get_post' ), 'permission_callback' => '__return_true' ));
-        register_rest_route( WPAIC_NAMESPACE, '/posts/(?P<id>\d+)', array( 'methods' => WP_REST_Server::EDITABLE, 'callback' => array( $this, 'update_post' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
+        register_rest_route( WPAIC_NAMESPACE, '/posts/(?P<id>\d+)', array( 'methods' => 'PUT', 'callback' => array( $this, 'update_post' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
         register_rest_route( WPAIC_NAMESPACE, '/posts/(?P<id>\d+)', array( 'methods' => 'DELETE', 'callback' => array( $this, 'delete_post' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
         register_rest_route( WPAIC_NAMESPACE, '/posts/(?P<id>\d+)/meta', array( 'methods' => 'GET', 'callback' => array( $this, 'get_post_meta_all' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
         register_rest_route( WPAIC_NAMESPACE, '/posts/(?P<id>\d+)/meta', array( 'methods' => 'POST', 'callback' => array( $this, 'update_post_meta_bulk' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
@@ -28,7 +28,7 @@ class WPAIC_API {
         register_rest_route( WPAIC_NAMESPACE, '/pages', array( 'methods' => 'GET', 'callback' => array( $this, 'get_pages' ), 'permission_callback' => '__return_true' ));
         register_rest_route( WPAIC_NAMESPACE, '/pages', array( 'methods' => 'POST', 'callback' => array( $this, 'create_page' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
         register_rest_route( WPAIC_NAMESPACE, '/pages/(?P<id>\d+)', array( 'methods' => 'GET', 'callback' => array( $this, 'get_page' ), 'permission_callback' => '__return_true' ));
-        register_rest_route( WPAIC_NAMESPACE, '/pages/(?P<id>\d+)', array( 'methods' => WP_REST_Server::EDITABLE, 'callback' => array( $this, 'update_page' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
+        register_rest_route( WPAIC_NAMESPACE, '/pages/(?P<id>\d+)', array( 'methods' => 'PUT', 'callback' => array( $this, 'update_page' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
         register_rest_route( WPAIC_NAMESPACE, '/pages/(?P<id>\d+)', array( 'methods' => 'DELETE', 'callback' => array( $this, 'delete_page' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
         register_rest_route( WPAIC_NAMESPACE, '/pages/(?P<id>\d+)/duplicate', array( 'methods' => 'POST', 'callback' => array( $this, 'duplicate_page' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
 
@@ -36,7 +36,7 @@ class WPAIC_API {
         register_rest_route( WPAIC_NAMESPACE, '/media', array( 'methods' => 'GET', 'callback' => array( $this, 'get_media' ), 'permission_callback' => '__return_true' ));
         register_rest_route( WPAIC_NAMESPACE, '/media/(?P<id>\d+)', array( 'methods' => 'GET', 'callback' => array( $this, 'get_media_item' ), 'permission_callback' => '__return_true' ));
         register_rest_route( WPAIC_NAMESPACE, '/media/(?P<id>\d+)', array( 'methods' => 'DELETE', 'callback' => array( $this, 'delete_media' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
-        register_rest_route( WPAIC_NAMESPACE, '/media/(?P<id>\d+)/meta', array( 'methods' => WP_REST_Server::EDITABLE, 'callback' => array( $this, 'update_media_meta' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
+        register_rest_route( WPAIC_NAMESPACE, '/media/(?P<id>\d+)/meta', array( 'methods' => 'PUT', 'callback' => array( $this, 'update_media_meta' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
         register_rest_route( WPAIC_NAMESPACE, '/media/upload', array( 'methods' => 'POST', 'callback' => array( $this, 'upload_media' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
 
         // Bulk operations
@@ -48,7 +48,7 @@ class WPAIC_API {
             register_rest_route( WPAIC_NAMESPACE, '/users', array( 'methods' => 'GET', 'callback' => array( $this, 'get_users' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
             register_rest_route( WPAIC_NAMESPACE, '/users', array( 'methods' => 'POST', 'callback' => array( $this, 'create_user' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
             register_rest_route( WPAIC_NAMESPACE, '/users/(?P<id>\d+)', array( 'methods' => 'GET', 'callback' => array( $this, 'get_user' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
-            register_rest_route( WPAIC_NAMESPACE, '/users/(?P<id>\d+)', array( 'methods' => WP_REST_Server::EDITABLE, 'callback' => array( $this, 'update_user' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
+            register_rest_route( WPAIC_NAMESPACE, '/users/(?P<id>\d+)', array( 'methods' => 'PUT', 'callback' => array( $this, 'update_user' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
             register_rest_route( WPAIC_NAMESPACE, '/users/(?P<id>\d+)', array( 'methods' => 'DELETE', 'callback' => array( $this, 'delete_user' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
         }
 
@@ -75,7 +75,7 @@ class WPAIC_API {
         // Settings
         if ( WPAIC_Plan::has_feature( 'settings', $plan ) ) {
             register_rest_route( WPAIC_NAMESPACE, '/settings', array( 'methods' => 'GET', 'callback' => array( $this, 'get_settings' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' )));
-            register_rest_route( WPAIC_NAMESPACE, '/settings', array( 'methods' => WP_REST_Server::EDITABLE, 'callback' => array( $this, 'update_settings' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
+            register_rest_route( WPAIC_NAMESPACE, '/settings', array( 'methods' => 'PUT', 'callback' => array( $this, 'update_settings' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
         }
 
         // Themes
@@ -102,7 +102,7 @@ class WPAIC_API {
         // Terms CRUD
         register_rest_route( WPAIC_NAMESPACE, '/terms', array( 'methods' => 'POST', 'callback' => array( $this, 'create_term' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
         register_rest_route( WPAIC_NAMESPACE, '/terms/(?P<id>\d+)', array( 'methods' => 'GET', 'callback' => array( $this, 'get_term' ), 'permission_callback' => '__return_true' ));
-        register_rest_route( WPAIC_NAMESPACE, '/terms/(?P<id>\d+)', array( 'methods' => WP_REST_Server::EDITABLE, 'callback' => array( $this, 'update_term' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
+        register_rest_route( WPAIC_NAMESPACE, '/terms/(?P<id>\d+)', array( 'methods' => 'PUT', 'callback' => array( $this, 'update_term' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
         register_rest_route( WPAIC_NAMESPACE, '/terms/(?P<id>\d+)', array( 'methods' => 'DELETE', 'callback' => array( $this, 'delete_term' ), 'permission_callback' => array( 'WPAIC_Auth', 'check' ) ));
 
         // Search
@@ -153,21 +153,13 @@ class WPAIC_API {
         return rest_ensure_response( array( 'success' => true, 'post_id' => $id ) );
     }
     public function update_post( $request ) {
-        $id = intval( $request['id'] );
-        if ( ! $id || ! get_post( $id ) ) {
-            return new WP_REST_Response( array( 'error' => 'Post not found' ), 404 );
-        }
-        $data = array( 'ID' => $id );
-        if ( null !== $request->get_param( 'title' ) )   $data['post_title']   = sanitize_text_field( $request->get_param( 'title' ) );
-        if ( null !== $request->get_param( 'content' ) ) $data['post_content'] = wp_kses_post( $request->get_param( 'content' ) );
-        if ( null !== $request->get_param( 'status' ) )  $data['post_status']  = sanitize_text_field( $request->get_param( 'status' ) );
-        if ( count( $data ) === 1 ) {
-            return new WP_REST_Response( array( 'error' => 'No update fields provided. Send title, content or status.' ), 400 );
-        }
+        $data = array( 'ID' => intval( $request['id'] ) );
+        if ( $request->get_param( 'title' ) ) $data['post_title']   = sanitize_text_field( $request->get_param( 'title' ) );
+        if ( $request->get_param( 'content' ) ) $data['post_content'] = wp_kses_post( $request->get_param( 'content' ) );
+        if ( $request->get_param( 'status' ) ) $data['post_status']  = sanitize_text_field( $request->get_param( 'status' ) );
         $result = wp_update_post( $data, true );
         if ( is_wp_error( $result ) ) return new WP_REST_Response( array( 'error' => $result->get_error_message() ), 422 );
-        if ( ! $result ) return new WP_REST_Response( array( 'error' => 'wp_update_post returned 0 (no changes applied)' ), 500 );
-        return rest_ensure_response( array( 'success' => true, 'post_id' => (int) $result ) );
+        return rest_ensure_response( array( 'success' => true ) );
     }
     public function delete_post( $request ) {
         wp_delete_post( $request['id'], true );
@@ -238,31 +230,19 @@ class WPAIC_API {
         return rest_ensure_response( array( 'success' => true, 'page_id' => $id ) );
     }
     public function update_page( $request ) {
-        $id   = intval( $request['id'] );
-        $post = $id ? get_post( $id ) : null;
-        if ( ! $post || 'page' !== $post->post_type ) {
-            return new WP_REST_Response( array( 'error' => 'Page not found' ), 404 );
-        }
-        $data = array( 'ID' => $id );
-        if ( null !== $request->get_param( 'title' ) )   $data['post_title']   = sanitize_text_field( $request->get_param( 'title' ) );
-        if ( null !== $request->get_param( 'content' ) ) $data['post_content'] = wp_kses_post( $request->get_param( 'content' ) );
-        if ( null !== $request->get_param( 'status' ) )  $data['post_status']  = sanitize_text_field( $request->get_param( 'status' ) );
-        if ( null !== $request->get_param( 'parent' ) ) {
+        $data = array( 'ID' => intval( $request['id'] ), 'post_type' => 'page' );
+        if ( $request->get_param( 'title' ) ) $data['post_title']   = sanitize_text_field( $request->get_param( 'title' ) );
+        if ( $request->get_param( 'content' ) ) $data['post_content'] = wp_kses_post( $request->get_param( 'content' ) );
+        if ( $request->get_param( 'status' ) ) $data['post_status']  = sanitize_text_field( $request->get_param( 'status' ) );
+        if ( $request->has_param( 'parent' ) ) {
             $data['post_parent'] = intval( $request->get_param( 'parent' ) );
         }
-        if ( null !== $request->get_param( 'slug' ) ) {
-            $slug = sanitize_title( (string) $request->get_param( 'slug' ) );
-            if ( '' !== $slug ) {
-                $data['post_name'] = $slug;
-            }
-        }
-        if ( count( $data ) === 1 ) {
-            return new WP_REST_Response( array( 'error' => 'No update fields provided. Send title, content, status, parent or slug.' ), 400 );
+        if ( null !== $request->get_param( 'slug' ) && '' !== (string) $request->get_param( 'slug' ) ) {
+            $data['post_name'] = sanitize_title( (string) $request->get_param( 'slug' ) );
         }
         $result = wp_update_post( $data, true );
         if ( is_wp_error( $result ) ) return new WP_REST_Response( array( 'error' => $result->get_error_message() ), 422 );
-        if ( ! $result ) return new WP_REST_Response( array( 'error' => 'wp_update_post returned 0 (no changes applied)' ), 500 );
-        return rest_ensure_response( array( 'success' => true, 'page_id' => (int) $result ) );
+        return rest_ensure_response( array( 'success' => true ) );
     }
     public function delete_page( $request ) {
         wp_delete_post( $request['id'], true );
@@ -418,20 +398,13 @@ class WPAIC_API {
         return rest_ensure_response( array( 'success' => true, 'user_id' => $user_id ) );
     }
     public function update_user( $request ) {
-        $id = intval( $request['id'] );
-        if ( ! $id || ! get_userdata( $id ) ) {
-            return new WP_REST_Response( array( 'error' => 'User not found' ), 404 );
-        }
-        $userdata = array( 'ID' => $id );
-        if ( null !== $request->get_param( 'email' ) ) $userdata['user_email']  = sanitize_email( $request->get_param( 'email' ) );
-        if ( null !== $request->get_param( 'name' ) )  $userdata['display_name'] = sanitize_text_field( $request->get_param( 'name' ) );
-        if ( null !== $request->get_param( 'role' ) )  $userdata['role']         = sanitize_text_field( $request->get_param( 'role' ) );
-        if ( count( $userdata ) === 1 ) {
-            return new WP_REST_Response( array( 'error' => 'No update fields provided. Send email, name or role.' ), 400 );
-        }
+        $userdata = array( 'ID' => intval( $request['id'] ) );
+        if ( $request->get_param( 'email' ) ) $userdata['user_email']   = sanitize_email( $request->get_param( 'email' ) );
+        if ( $request->get_param( 'name' ) ) $userdata['display_name']  = sanitize_text_field( $request->get_param( 'name' ) );
+        if ( $request->get_param( 'role' ) ) $userdata['role']           = sanitize_text_field( $request->get_param( 'role' ) );
         $result = wp_update_user( $userdata );
         if ( is_wp_error( $result ) ) return new WP_REST_Response( array( 'error' => $result->get_error_message() ), 422 );
-        return rest_ensure_response( array( 'success' => true, 'user_id' => (int) $result ) );
+        return rest_ensure_response( array( 'success' => true ) );
     }
     public function delete_user( $request ) {
         require_once ABSPATH . 'wp-admin/includes/user.php';
@@ -525,9 +498,6 @@ class WPAIC_API {
                 update_option( $key, sanitize_text_field( $request->get_param( $key ) ) );
                 $updated[] = $key;
             }
-        }
-        if ( empty( $updated ) ) {
-            return new WP_REST_Response( array( 'error' => 'No allowed settings keys provided. Allowed: ' . implode( ', ', $allowed ) ), 400 );
         }
         return rest_ensure_response( array( 'success' => true, 'updated' => $updated ) );
     }
@@ -658,21 +628,15 @@ class WPAIC_API {
     }
 
     public function update_term( $request ) {
-        $term_id  = intval( $request['id'] );
+        $term_id  = $request['id'];
         $taxonomy = sanitize_key( $request->get_param( 'taxonomy' ) );
-        if ( empty( $taxonomy ) ) {
-            return new WP_REST_Response( array( 'error' => 'taxonomy is required' ), 400 );
-        }
-        $args = array();
-        if ( null !== $request->get_param( 'name' ) )        $args['name']        = sanitize_text_field( $request->get_param( 'name' ) );
-        if ( null !== $request->get_param( 'description' ) ) $args['description'] = sanitize_textarea_field( $request->get_param( 'description' ) );
-        if ( $request->has_param( 'parent' ) )               $args['parent']      = intval( $request->get_param( 'parent' ) );
-        if ( empty( $args ) ) {
-            return new WP_REST_Response( array( 'error' => 'No update fields provided. Send name, description or parent.' ), 400 );
-        }
+        $args     = array();
+        if ( $request->get_param( 'name' ) ) $args['name'] = sanitize_text_field( $request->get_param( 'name' ) );
+        if ( $request->get_param( 'description' ) ) $args['description'] = sanitize_textarea_field( $request->get_param( 'description' ) );
+        if ( $request->has_param( 'parent' ) ) $args['parent'] = intval( $request->get_param( 'parent' ) );
         $result = wp_update_term( $term_id, $taxonomy, $args );
         if ( is_wp_error( $result ) ) return new WP_REST_Response( array( 'error' => $result->get_error_message() ), 422 );
-        return rest_ensure_response( array( 'success' => true, 'term_id' => isset( $result['term_id'] ) ? (int) $result['term_id'] : $term_id ) );
+        return rest_ensure_response( array( 'success' => true ) );
     }
 
     public function delete_term( $request ) {

@@ -1,6 +1,6 @@
 {
   "name": "wp-ai-control-mcp",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "type": "module",
   "description": "MCP server for WP AI Control WordPress plugin",
   "repository": {

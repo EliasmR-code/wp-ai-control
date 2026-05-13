@@ -1,8 +1,11 @@
 {
-  "name": "wp-ai-control-railway",
+  "name": "wp-ai-control-monorepo",
   "version": "1.0.0",
-  "description": "WP AI Control MCP Server on Railway",
+  "private": true,
+  "description": "WP AI Control: plugin, MCP, CLI y skills",
   "scripts": {
+    "install:mcp": "npm install --prefix wp-ai-control-mcp",
+    "bootstrap:mcp": "npm run install:mcp",
     "start": "cd wp-ai-control-mcp && npm install && node index.js"
   },
   "dependencies": {}

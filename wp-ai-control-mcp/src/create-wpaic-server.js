@@ -22,13 +22,23 @@ function isToolAllowedByPlan(tool, capabilities) {
   return capabilities.features.has(feature);
 }
 
+/**
+ * Plan/capabilities for the site that will execute the tool (per-request or env fallback).
+ * Used only when calling tools — not for ListTools, so a shared Railway MCP never filters
+ * the catalog based on one tenant's plan.
+ */
 async function getCapabilities(site_url, api_key) {
+  const url = site_url || process.env.WP_URL;
+  const key = api_key || process.env.WP_API_KEY;
+  if (!url || !key) {
+    return null;
+  }
   try {
     const planInfo = await wpFetch('/plan-info', {
       method: 'GET',
       params: {},
-      site_url,
-      api_key,
+      site_url: url,
+      api_key: key,
     });
     return buildCapabilities(planInfo);
   } catch {
@@ -46,18 +56,14 @@ function sanitizeTool(tool) {
  */
 export function createWpaicMcpServer() {
   const server = new Server(
-    { name: 'wp-ai-control-mcp', version: '1.1.0' },
+    { name: 'wp-ai-control-mcp', version: '1.1.1' },
     { capabilities: { tools: {} } }
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    const capabilities = await getCapabilities();
-    if (!capabilities) {
-      return { tools: tools.map(sanitizeTool) };
-    }
-
-    const filtered = tools.filter((tool) => isToolAllowedByPlan(tool, capabilities));
-    return { tools: filtered.map(sanitizeTool) };
+    // Multi-tenant: always advertise the full tool catalog. Plan gating runs on each tools/call
+    // using that caller's site_url + api_key (or optional WP_* env fallback).
+    return { tools: tools.map(sanitizeTool) };
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {

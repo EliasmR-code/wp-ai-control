@@ -15,13 +15,15 @@ function useHttpMode() {
 }
 
 if (useHttpMode()) {
-  if (!process.env.WP_URL || !process.env.WP_API_KEY) {
+  if (process.env.WP_URL && process.env.WP_API_KEY) {
     console.error(
-      '[wp-ai-control-mcp] Running in HTTP mode without default WP_URL/WP_API_KEY. ' +
-        'Each tool call MUST supply site_url and api_key (multi-tenant mode).'
+      '[wp-ai-control-mcp] HTTP: optional WP_URL/WP_API_KEY set (fallback when a tool omits site_url/api_key). ' +
+        'For shared hosting, leave both unset so every user passes credentials per call.'
     );
   } else {
-    console.error('[wp-ai-control-mcp] HTTP mode with default WP credentials from environment (single-tenant fallback).');
+    console.error(
+      '[wp-ai-control-mcp] HTTP: multi-tenant mode (recommended). Each tools/call must include site_url and api_key.'
+    );
   }
   await startHttpMcpServer();
 } else {

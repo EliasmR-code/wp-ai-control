@@ -583,7 +583,7 @@ const skillHandlers = {
   }
 };
 
-class WP AISkillsServer {
+class WpaicSkillsServer {
   constructor() {
     this.server = new Server(
       { name: 'wp-ai-control-skills', version: '1.1.0' },
@@ -602,7 +602,7 @@ class WP AISkillsServer {
       const handler = skillHandlers[name];
       if (!handler) return { content: [{ type: 'text', text: `Skill ${name} not found` }] };
       try {
-        const result = await handler(args);
+        const result = await handler(args || {});
         return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
       } catch (error) {
         return { content: [{ type: 'text', text: `Error: ${error.message}` }] };
@@ -617,4 +617,4 @@ class WP AISkillsServer {
   }
 }
 
-new WP AISkillsServer().run();
+new WpaicSkillsServer().run();

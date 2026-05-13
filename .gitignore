@@ -1,0 +1,11 @@
+# Credenciales del MCP (se genera desde .env.example al hacer npm install en wp-ai-control-mcp)
+wp-ai-control-mcp/.env
+
+# Node
+node_modules/
+
+# PHP (Composer)
+/vendor/
+
+# IDE
+.cursor/
